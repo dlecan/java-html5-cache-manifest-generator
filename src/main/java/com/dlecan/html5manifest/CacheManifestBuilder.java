@@ -25,23 +25,39 @@ package com.dlecan.html5manifest;
 public class CacheManifestBuilder {
 
 	public interface Cache {
-		public CacheManifestBuilder add(String resource);
+		public Cache add(String resource);
 	}
 
 	public interface Network {
-		public CacheManifestBuilder add(String resource);
+		public Network add(String resource);
 
 		public CacheManifestBuilder addAll();
 
 	}
 
 	public interface Fallback {
-
-		public CacheManifestBuilder add(String resource, String fallbackResource);
+		public Fallback add(String resource, String fallbackResource);
 
 	}
 
-	private class Section implements Cache, Network, Fallback {
+	private class SectionCache implements Cache {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.dlecan.html5manifest.CacheManifestBuilder.Cache#add(java.lang
+		 * .String)
+		 */
+		@Override
+		public Cache add(String resource) {
+			// TODO Auto-generated method stub
+			return this;
+		}
+
+	}
+
+	private class SectionFallback implements Fallback {
 
 		/*
 		 * (non-Javadoc)
@@ -51,10 +67,14 @@ public class CacheManifestBuilder {
 		 * .String, java.lang.String)
 		 */
 		@Override
-		public CacheManifestBuilder add(String resource, String fallbackResource) {
+		public Fallback add(String resource, String fallbackResource) {
 			// TODO Auto-generated method stub
-			return CacheManifestBuilder.this;
+			return this;
 		}
+
+	}
+
+	private class SectionNetwork implements Network {
 
 		/*
 		 * (non-Javadoc)
@@ -71,15 +91,14 @@ public class CacheManifestBuilder {
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * com.dlecan.html5manifest.CacheManifestBuilder.Cache#add(java.lang
+		 * com.dlecan.html5manifest.CacheManifestBuilder.Network#add(java.lang
 		 * .String)
 		 */
 		@Override
-		public CacheManifestBuilder add(String resource) {
+		public Network add(String resource) {
 			// TODO Auto-generated method stub
-			return CacheManifestBuilder.this;
+			return this;
 		}
-
 	}
 
 	private static final String HEADER = "CACHE MANIFEST";
@@ -92,7 +111,11 @@ public class CacheManifestBuilder {
 
 	private String version = "";
 
-	private Section section = new Section();
+	private SectionCache sectionCache = new SectionCache();
+	
+	private SectionNetwork sectionNetwork = new SectionNetwork();
+	
+	private SectionFallback sectionFallback = new SectionFallback();
 
 	private CacheManifestBuilder() {
 	}
@@ -102,15 +125,15 @@ public class CacheManifestBuilder {
 	}
 
 	public CacheManifestBuilder.Cache getCache() {
-		return section;
+		return sectionCache;
 	}
 
 	public CacheManifestBuilder.Network getNetwork() {
-		return section;
+		return sectionNetwork;
 	}
 
 	public CacheManifestBuilder.Fallback getFallback() {
-		return section;
+		return sectionFallback;
 	}
 
 	public String toRawString() {

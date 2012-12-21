@@ -13,6 +13,10 @@ import java.nio.charset.Charset;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dlecan.html5manifest.CacheManifestBuilder.Cache;
+import com.dlecan.html5manifest.CacheManifestBuilder.Fallback;
+import com.dlecan.html5manifest.CacheManifestBuilder.Network;
+
 public class CacheManifestBuilderTest {
 
 	private CacheManifestBuilder builder;
@@ -27,9 +31,19 @@ public class CacheManifestBuilderTest {
 
 		String expectedManifest = readFile("/file1.manifest");
 
-		String manifest = builder.withVersion("myversion").getCache()
-				.add("/truc").getCache().add("muche").getNetwork().addAll()
-				.getFallback().add("/bidule", "offline.html").toRawString();
+		builder.withVersion("2010-06-18:v2");
+		Cache cache = builder.getCache();
+		cache.add("/favicon.ico").add("index.html").add("images/logo.png");
+
+		Network network = builder.getNetwork();
+		network.add("login.php").add("/myapi").add("http://api.twitter.com");
+
+		Fallback fallback = builder.getFallback();
+		fallback.add("/main.py", "/static.html")
+				.add("images/large/", "images/offline.jpg")
+				.add("*.html", "/offline.html");
+
+		String manifest = builder.toRawString();
 
 		assertThat(manifest, equalTo(expectedManifest));
 	}
