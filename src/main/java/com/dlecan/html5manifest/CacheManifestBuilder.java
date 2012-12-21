@@ -1,5 +1,8 @@
 package com.dlecan.html5manifest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -51,7 +54,8 @@ public class CacheManifestBuilder {
 		 */
 		@Override
 		public Cache add(String resource) {
-			// TODO Auto-generated method stub
+			assert resource != null : "Resource cannot be null";
+			itemsCache.add(resource);
 			return this;
 		}
 
@@ -68,7 +72,9 @@ public class CacheManifestBuilder {
 		 */
 		@Override
 		public Fallback add(String resource, String fallbackResource) {
-			// TODO Auto-generated method stub
+			assert resource != null : "Resource cannot be null";
+			assert fallbackResource != null : "Fallback cannot be null";
+			itemFallback.add(new String[] { resource, fallbackResource });
 			return this;
 		}
 
@@ -83,7 +89,7 @@ public class CacheManifestBuilder {
 		 */
 		@Override
 		public CacheManifestBuilder addAll() {
-			// TODO Auto-generated method stub
+			itemsNetwork.add("*");
 			return CacheManifestBuilder.this;
 		}
 
@@ -96,10 +102,13 @@ public class CacheManifestBuilder {
 		 */
 		@Override
 		public Network add(String resource) {
-			// TODO Auto-generated method stub
+			assert resource != null : "Resource cannot be null";
+			itemsNetwork.add(resource);
 			return this;
 		}
 	}
+
+	private static final char EOL = '\n';
 
 	private static final String HEADER = "CACHE MANIFEST";
 
@@ -112,10 +121,16 @@ public class CacheManifestBuilder {
 	private String version = "";
 
 	private SectionCache sectionCache = new SectionCache();
-	
+
+	private List<String> itemsCache = new ArrayList<String>();
+
 	private SectionNetwork sectionNetwork = new SectionNetwork();
-	
+
+	private List<String> itemsNetwork = new ArrayList<String>();
+
 	private SectionFallback sectionFallback = new SectionFallback();
+
+	private List<String[]> itemFallback = new ArrayList<String[]>();
 
 	private CacheManifestBuilder() {
 	}
@@ -136,11 +151,6 @@ public class CacheManifestBuilder {
 		return sectionFallback;
 	}
 
-	public String toRawString() {
-
-		return null;
-	}
-
 	/**
 	 * @param version
 	 *            the version to set
@@ -148,6 +158,51 @@ public class CacheManifestBuilder {
 	public CacheManifestBuilder withVersion(String version) {
 		this.version = version;
 		return this;
+	}
+
+	public String toRawString() {
+		StringBuilder sb = new StringBuilder(HEADER);
+
+		sb.append(EOL);
+
+		sb.append("# ");
+		
+		sb.append(version);
+
+		sb.append(EOL);
+		sb.append(EOL);
+
+		sb.append(SECTION_HEADER_CACHE);
+		sb.append(EOL);
+
+		for (String cache : itemsCache) {
+			sb.append(cache);
+			sb.append(EOL);
+		}
+		
+		sb.append(EOL);
+
+		sb.append(SECTION_HEADER_NETWORK);
+		sb.append(EOL);
+
+		for (String network : itemsNetwork) {
+			sb.append(network);
+			sb.append(EOL);
+		}
+
+		sb.append(EOL);
+
+		sb.append(SECTION_HEADER_FALLBACK);
+		sb.append(EOL);
+
+		for (String[] fallback : itemFallback) {
+			sb.append(fallback[0]);
+			sb.append(' ');
+			sb.append(fallback[1]);
+			sb.append(EOL);
+		}
+
+		return sb.toString();
 	}
 
 }
